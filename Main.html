@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palworld Hub v7.5 - Module Tutos Vidéo</title>
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --border: #334155;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); padding: 20px; line-height: 1.5; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
+        h1 { font-size: 1.5rem; color: var(--accent); display: flex; align-items: center; gap: 10px; }
+        
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn {
+            background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border);
+            padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s; font-size: 0.9rem;
+        }
+        .tab-btn.active, .tab-btn:hover { background: var(--accent); color: #0f172a; border-color: var(--accent); }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-muted); font-size: 0.9rem; }
+        select, input, textarea {
+            width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border);
+            background: var(--bg-input); color: var(--text-main); font-size: 1rem; margin-bottom: 15px;
+        }
+        button.action-btn {
+            background: var(--accent); color: #0f172a; border: none; padding: 10px 18px;
+            border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        button.action-btn:hover { background: var(--accent-hover); color: white; }
+        button.secondary-btn, a.secondary-btn {
+            background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border);
+            padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; text-decoration: none; display: inline-block; font-size: 0.9rem; text-align: center;
+        }
+        button.secondary-btn:hover, a.secondary-btn:hover { border-color: var(--accent); color: var(--accent); }
+        button.danger-btn { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        button.qty-btn { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); padding: 2px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button.qty-btn:hover { background: var(--accent); color: #0f172a; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        th { color: var(--accent); font-size: 0.9rem; text-transform: uppercase; }
+        
+        .badge {
+            display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem;
+            background: var(--bg-input); color: var(--accent); margin-right: 5px; margin-bottom: 4px;
+        }
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .badge-warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .result-box { background: rgba(56, 189, 248, 0.1); border-left: 4px solid var(--accent); padding: 15px; border-radius: 6px; margin-top: 10px; }
+
+        .entity-row { display: flex; align-items: center; gap: 12px; }
+        .avatar-badge {
+            width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center;
+            justify-content: center; font-weight: bold; font-size: 0.85rem; color: white; flex-shrink: 0;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3); text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .avatar-lg { width: 50px; height: 50px; font-size: 1.1rem; border-radius: 12px; }
+
+        .wiki-card {
+            background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border); border-radius: 8px;
+            padding: 15px; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
+        }
+        .wiki-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+        .map-container { width: 100%; height: 75vh; border-radius: 10px; border: 1px solid var(--border); overflow: hidden; background: #000; }
+        .map-container iframe { width: 100%; height: 100%; border: none; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>⚡ Palworld Hub <span style="font-size:0.8rem; background:var(--bg-input); padding:4px 10px; border-radius:20px; color:var(--accent);">v7.5 Tutos Vidéo</span></h1>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="secondary-btn" onclick="exportBackup()">💾 Exporter Sauvegarde</button>
+        <button class="secondary-btn" onclick="document.getElementById('importFile').click()">📂 Importer</button>
+        <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importBackup(event)">
+    </div>
+</header>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('map', this)">🗺️ Carte</button>
+    <button class="tab-btn" onclick="switchTab('wiki', this)">📖 Wiki & Pals</button>
+    <button class="tab-btn" onclick="switchTab('breeding', this)">🧬 Reproduction</button>
+    <button class="tab-btn" onclick="switchTab('production', this)">⚙️ Craft & Plans</button>
+    <button class="tab-btn" onclick="switchTab('condensation', this)">⭐ Condensation</button>
+    <button class="tab-btn" onclick="switchTab('tutorials', this)">🎥 Tutos & Vidéos</button>
+    <button class="tab-btn" onclick="switchTab('inventory', this)">📦 Coffres</button>
+    <button class="tab-btn" onclick="switchTab('base', this)">🏕️ Mes Pals</button>
+</div>
+
+<!-- ONGLET 0 : CARTE -->
+<div id="map" class="tab-content active">
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+            <div>
+                <h3 style="margin-bottom: 4px;">🗺️ Carte Interactive (TP, Tours, Donjons, Boss & Ressources)</h3>
+                <p style="color:var(--text-muted); font-size:0.85rem;">Tous les points stratégiques directement sous les yeux sur ton deuxième écran.</p>
+            </div>
+            <a href="https://mapgenie.io/palworld/maps/palpagos-islands" target="_blank" class="secondary-btn">↗️ Ouvrir en grand</a>
+        </div>
+        <div class="map-container">
+            <iframe src="https://mapgenie.io/palworld/maps/palpagos-islands" title="Palworld Interactive Map"></iframe>
+        </div>
+    </div>
+</div>
+
+<!-- ONGLET 1 : WIKI & ENCYCLOPÉDIE -->
+<div id="wiki" class="tab-content">
+    <div class="card">
+        <h3>🔎 Recherche Globale (Base 100% Intégrale + Zones & TP)</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <input type="text" id="wikiSearchInput" placeholder="Rechercher un Pal, une zone, un TP..." style="flex: 1; min-width: 250px; margin-bottom: 0;" oninput="searchWiki()">
+            <select id="wikiFilterType" style="width: 180px; margin-bottom: 0;" onchange="searchWiki()">
+                <option value="all">Tout afficher</option>
+                <option value="pal">Pals uniquement</option>
+                <option value="recipe">Plans & Recettes</option>
+                <option value="guide">Guides & Astuces</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="wikiResultsGrid" class="grid-3"></div>
+
+    <div class="card" style="margin-top: 20px;">
+        <h3>✍️ Ajouter une fiche / astuce personnalisée</h3>
+        <div class="grid-2" style="gap: 10px;">
+            <div>
+                <label>Titre de la fiche :</label>
+                <input type="text" id="customWikiTitle" placeholder="Ex: Spot Farm Minéraux">
+            </div>
+            <div>
+                <label>Tags :</label>
+                <input type="text" id="customWikiTags" placeholder="Ex: Farm, Boss">
+            </div>
+        </div>
+        <label>Contenu :</label>
+        <textarea id="customWikiContent" rows="2" placeholder="Détails, coordonnées, astuces..."></textarea>
+        <button class="action-btn" onclick="addCustomWikiNote()">Enregistrer dans mon Wiki</button>
+    </div>
+</div>
+
+<!-- ONGLET 2 : REPRODUCTION -->
+<div id="breeding" class="tab-content">
+    <div class="grid-2">
+        <div class="card">
+            <h3>🔍 Trouver les parents pour un Pal</h3>
+            <label for="targetPal">Pal souhaité :</label>
+            <select id="targetPal" onchange="findParents()"></select>
+            <div id="parentsList" style="max-height: 450px; overflow-y: auto;"></div>
+        </div>
+
+        <div class="card">
+            <h3>🧪 Simuler un croisement</h3>
+            <label for="parent1">Parent 1 :</label>
+            <select id="parent1" onchange="simulateBreeding()"></select>
+            <label for="parent2">Parent 2 :</label>
+            <select id="parent2" onchange="simulateBreeding()"></select>
+            <div class="result-box" id="breedingResult">Sélectionne deux parents...</div>
+        </div>
+    </div>
+</div>
+
+<!-- ONGLET 3 : PRODUCTION -->
+<div id="production" class="tab-content">
+    <div class="grid-2">
+        <div class="card">
+            <h3>🛠️ Planificateur de Craft</h3>
+            <label for="craftCategoryFilter">Filtrer par catégorie :</label>
+            <select id="craftCategoryFilter" onchange="populateCraftSelect()">
+                <option value="all">Toutes les catégories</option>
+                <option value="Sphères">🔮 Sphères</option>
+                <option value="Matériaux">🧱 Matériaux</option>
+                <option value="Armes">⚔️ Armes</option>
+                <option value="Munitions">🧨 Munitions</option>
+                <option value="Équipement">🛡️ Équipement</option>
+                <option value="Consommables">🍰 Consommables</option>
+            </select>
+
+            <label for="craftItem">Objet / Plan à produire :</label>
+            <select id="craftItem" onchange="calculateProduction()"></select>
+
+            <label for="craftQty">Quantité souhaitée :</label>
+            <input type="number" id="craftQty" value="10" min="1" onchange="calculateProduction()" oninput="calculateProduction()">
+
+            <div class="result-box" id="productionSummary"></div>
+        </div>
+
+        <div class="card">
+            <h3>📦 Ressources nécessaires vs ton Stock</h3>
+            <div id="rawResourcesList"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ONGLET 4 : CONDENSATION & ÉTOILES -->
+<div id="condensation" class="tab-content">
+    <div class="grid-2">
+        <div class="card">
+            <h3>⭐ Calculateur de Condensation (Chambre d'Extraction)</h3>
+            <label for="condTargetPal">Sélectionner le Pal à améliorer :</label>
+            <select id="condTargetPal" onchange="calculateCondensation()"></select>
+
+            <label for="condCurrentStars">Étoile actuelle du Pal :</label>
+            <select id="condCurrentStars" onchange="calculateCondensation()">
+                <option value="0">0 Étoile (Base)</option>
+                <option value="1">⭐ 1 Étoile (4 doublons faits)</option>
+                <option value="2">⭐⭐ 2 Étoiles (20 doublons faits)</option>
+                <option value="3">⭐⭐⭐ 3 Étoiles (52 doublons faits)</option>
+            </select>
+
+            <label for="condOwned">Nombre total de doublons en stock (ou sacrifiés) :</label>
+            <input type="number" id="condOwned" value="0" min="0" onchange="calculateCondensation()" oninput="calculateCondensation()">
+
+            <div class="result-box" id="condensationSummary"></div>
+        </div>
+
+        <div class="card">
+            <h3>📊 Paliers officiels du Condenseur</h3>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 12px;">Nombre total cumulé de doublons nécessaires pour atteindre chaque rang d'étoiles :</p>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <div style="background:var(--bg-input); padding:10px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>⭐ 1 Étoile (Rang 1)</span>
+                    <strong style="color:var(--accent);">4 Pals requis</strong>
+                </div>
+                <div style="background:var(--bg-input); padding:10px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>⭐⭐ 2 Étoiles (Rang 2)</span>
+                    <strong style="color:var(--accent);">20 Pals requis cumulés</strong>
+                </div>
+                <div style="background:var(--bg-input); padding:10px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>⭐⭐⭐ 3 Étoiles (Rang 3)</span>
+                    <strong style="color:var(--accent);">52 Pals requis cumulés</strong>
+                </div>
+                <div style="background:var(--bg-input); padding:10px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>⭐⭐⭐⭐ 4 Étoiles (Max)</span>
+                    <strong style="color:var(--accent);">116 Pals requis cumulés</strong>
+                </div>
+            </div>
+            <p style="color:var(--text-muted); font-size:0.8rem; margin-top:15px;">💡 *Note : Le total requis pour le max absolu (4 étoiles) est de **116 doublons** au total.*</p>
+        </div>
+    </div>
+</div>
+
+<!-- ONGLET 5 : TUTOS & VIDÉOS YOUTUBE -->
+<div id="tutorials" class="tab-content">
+    <div class="card">
+        <h3>🎥 Guides & Tutoriels Vidéo Recommandés</h3>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 15px;">Sélection de liens directs vers les meilleures ressources YouTube pour optimiser ton aventure :</p>
+        
+        <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+            <input type="text" id="videoSearchFilter" placeholder="Filtrer les tutos..." style="flex:1; min-width:200px; margin-bottom:0;" oninput="renderTutorials()">
+            <select id="videoCatFilter" style="width:180px; margin-bottom:0;" onchange="renderTutorials()">
+                <option value="all">Toutes catégories</option>
+                <option value="Débutant">🌱 Débutant & Bases</option>
+                <option value="Reproduction">🧬 Reproduction & Passifs</option>
+                <option value="Farm">⛏️ Farm & Économie</option>
+                <option value="Endgame">⚔️ Endgame & Boss</option>
+            </select>
+        </div>
+
+        <div id="tutorialsGrid" class="grid-3"></div>
+    </div>
+
+    <div class="card">
+        <h3>➕ Ajouter un lien de tutoriel favori</h3>
+        <div class="grid-2" style="gap: 10px;">
+            <div>
+                <label>Titre de la vidéo / du tuto :</label>
+                <input type="text" id="customVideoTitle" placeholder="Ex: Guide complet des fermes auto">
+            </div>
+            <div>
+                <label>Catégorie :</label>
+                <select id="customVideoCat">
+                    <option value="Débutant">🌱 Débutant & Bases</option>
+                    <option value="Reproduction">🧬 Reproduction & Passifs</option>
+                    <option value="Farm">⛏️ Farm & Économie</option>
+                    <option value="Endgame">⚔️ Endgame & Boss</option>
+                </select>
+            </div>
+        </div>
+        <label>Lien YouTube URL :</label>
+        <input type="text" id="customVideoUrl" placeholder="https://www.youtube.com/watch?v=...">
+        <button class="action-btn" onclick="addCustomVideo()">Enregistrer ce lien</button>
+    </div>
+</div>
+
+<!-- ONGLET 6 : INVENTAIRE -->
+<div id="inventory" class="tab-content">
+    <div class="card">
+        <h3>➕ Ajouter / Modifier une ressource en stock</h3>
+        <div class="grid-2" style="gap: 10px;">
+            <div>
+                <label>Nom de l'item / ressource :</label>
+                <input type="text" id="invItemName" list="commonItemsList" placeholder="Ex: Minerai de métal...">
+                <datalist id="commonItemsList"></datalist>
+            </div>
+            <div>
+                <label>Quantité actuelle :</label>
+                <input type="number" id="invItemQty" value="0" min="0">
+            </div>
+        </div>
+        <button class="action-btn" onclick="saveInventoryItem()">Mettre à jour le stock</button>
+    </div>
+
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
+            <h3>📋 État actuel des coffres</h3>
+            <input type="text" id="invSearch" placeholder="🔍 Filtrer..." style="width: 250px; margin:0;" oninput="renderInventory()">
+        </div>
+        <table>
+            <thead>
+                <tr><th>Ressource</th><th>Quantité</th><th>Ajuster</th><th>Action</th></tr>
+            </thead>
+            <tbody id="inventoryTable"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ONGLET 7 : MES PALS -->
+<div id="base" class="tab-content">
+    <div class="card">
+        <h3>➕ Enregistrer un Pal de mon élevage</h3>
+        <div class="grid-2" style="gap: 10px;">
+            <div>
+                <label>Espèce :</label>
+                <select id="myPalSpecies"></select>
+            </div>
+            <div>
+                <label>Passifs :</label>
+                <input type="text" id="myPalPassives" placeholder="Artisan, Légende...">
+            </div>
+        </div>
+        <button class="action-btn" onclick="addMyPal()">Enregistrer ce Pal</button>
+    </div>
+
+    <div class="card">
+        <h3>📋 Mes Pals disponibles</h3>
+        <table>
+            <thead>
+                <tr><th>Pal</th><th>Puissance</th><th>Passifs</th><th>Action</th></tr>
+            </thead>
+            <tbody id="myPalsTable"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+const ELEMENT_COLORS = { "Neutre": "#64748b", "Feu": "#ef4444", "Eau": "#3b82f6", "Plante": "#22c55e", "Électrik": "#eab308", "Glace": "#06b6d4", "Sol": "#d97706", "Ténèbres": "#8b5cf6", "Dragon": "#ec4899" };
+
+const PALS_DB = [
+    { name: "Lamball", element: "Neutre", power: 1470, zone: "Plateau des origines", tp: "Plateau des origines", work: "Travaux manuels 1, Transport 1", url: "https://palworld.gg/fr/pal/lamball" },
+    { name: "Cattiva", element: "Neutre", power: 1460, zone: "Plateau des origines", tp: "Plateau des origines", work: "Travaux manuels 1, Minage 1", url: "https://palworld.gg/fr/pal/cattiva" },
+    { name: "Chikipi", element: "Neutre", power: 1500, zone: "Prairies verdoyantes", tp: "Petite crique", work: "Collecte 1, Ferme 1", url: "https://palworld.gg/fr/pal/chikipi" },
+    { name: "Lifmunk", element: "Plante", power: 1430, zone: "Collines du vent", tp: "Église abandonnée", work: "Semis 1, Abattage 1", url: "https://palworld.gg/fr/pal/lifmunk" },
+    { name: "Foxparks", element: "Feu", power: 1400, zone: "Collines du vent", tp: "Colline venteuse", work: "Allumage 1", url: "https://palworld.gg/fr/pal/foxparks" },
+    { name: "Fuack", element: "Eau", power: 1330, zone: "Ravin des falaises", tp: "Entrée de la grotte du ravin", work: "Arrosage 1", url: "https://palworld.gg/fr/pal/fuack" },
+    { name: "Sparkit", element: "Électrik", power: 1410, zone: "Île oubliée", tp: "Plage de l'île oubliée", work: "Énergie 1", url: "https://palworld.gg/fr/pal/sparkit" },
+    { name: "Tanzee", element: "Plante", power: 1250, zone: "Collines verdoyantes", tp: "Pont d'Azo", work: "Semis 1, Abattage 1", url: "https://palworld.gg/fr/pal/tanzee" },
+    { name: "Rooby", element: "Feu", power: 1155, zone: "Mont Obsidian (Pieds)", tp: "Chute de magma", work: "Allumage 1", url: "https://palworld.gg/fr/pal/rooby" },
+    { name: "Pengullet", element: "Eau", power: 1350, zone: "Côte gelée / Collines", tp: "Pont de l'étang", work: "Arrosage 1, Glace 1", url: "https://palworld.gg/fr/pal/pengullet" },
+    { name: "Penking", element: "Eau", power: 520, zone: "Sanctuaire / Donjon Niv.15", tp: "Île des Pêcheurs (Donjon)", work: "Arrosage 2, Glace 2", url: "https://palworld.gg/fr/pal/penking" },
+    { name: "Anubis", element: "Sol", power: 570, zone: "Désert de Twilight (Boss Niv.47)", tp: "Dunes arides", work: "Travaux manuels 4, Minage 3", url: "https://palworld.gg/fr/pal/anubis" },
+    { name: "Jormuntide", element: "Eau", power: 310, zone: "Lac stagnant (Boss Niv.45)", tp: "Étang paisible", work: "Arrosage 4", url: "https://palworld.gg/fr/pal/jormuntide" },
+    { name: "Jormuntide Ignis", element: "Feu", power: 315, zone: "Sanctuaire de la nature n°2", tp: "Sanctuaire n°2", work: "Allumage 4", url: "https://palworld.gg/fr/pal/jormuntide-ignis" },
+    { name: "Blazamut", element: "Feu", power: 10, zone: "Mont Obsidian (Profondeurs)", tp: "Pyramide du Mont Obsidian", work: "Allumage 3, Minage 4", url: "https://palworld.gg/fr/pal/blazamut" },
+    { name: "Astegon", element: "Dragon", power: 150, zone: "Mont Obsidian (Mine)", tp: "Mine détruite", work: "Travaux manuels 1, Minage 4", url: "https://palworld.gg/fr/pal/astegon" },
+    { name: "Orserk", element: "Électrik", power: 140, zone: "Sanctuaire de la nature n°3", tp: "Sanctuaire n°3", work: "Énergie 4, Transport 3", url: "https://palworld.gg/fr/pal/orserk" },
+    { name: "Shadowbeak", element: "Ténèbres", power: 60, zone: "Réserve naturelle n°3", tp: "Sanctuaire n°3", work: "Abattage 1", url: "https://palworld.gg/fr/pal/shadowbeak" },
+    { name: "Frostallion", element: "Glace", power: 120, zone: "Montagne astrale (Légendaire)", tp: "Terre immaculée", work: "Glace 4", url: "https://palworld.gg/fr/pal/frostallion" },
+    { name: "Jetragon", element: "Dragon", power: 90, zone: "Mont Obsidian (Légendaire)", tp: "Plage immortelle", work: "Collecte 3", url: "https://palworld.gg/fr/pal/jetragon" },
+    { name: "Paladius", element: "Neutre", power: 80, zone: "Désert aride (Duo légendaire)", tp: "Entrée du désert", work: "Minage 2, Abattage 2", url: "https://palworld.gg/fr/pal/paladius" },
+    { name: "Necromus", element: "Ténèbres", power: 70, zone: "Désert aride (Duo légendaire)", tp: "Entrée du désert", work: "Minage 2, Abattage 2", url: "https://palworld.gg/fr/pal/necromus" },
+    { name: "Grizzbolt", element: "Électrik", power: 200, zone: "Réserve naturelle n°1", tp: "Sanctuaire n°1", work: "Énergie 3, Transport 3", url: "https://palworld.gg/fr/pal/grizzbolt" },
+    { name: "Lyleen", element: "Plante", power: 250, zone: "Sanctuaire de la nature n°3", tp: "Sanctuaire n°3", work: "Semis 4, Pharmacie 3", url: "https://palworld.gg/fr/pal/lyleen" }
+];
+
+const EXTRA_PALS = [
+    "Jolthog", "Gumoss", "Vixy", "Hoocrates", "Teafant", "Depresso", "Cremis", "Daedream", "Rushoar", "Nox", "Fuddler", "Killamari", "Mau", "Celaray", "Direhowl", "Tocotoco", "Flopie", "Mozzarina", "Bristla", "Gobfin", "Hangyu", "Mossanda", "Woolipop", "Caprity", "Melpaca", "Eikthyrdeer", "Nitewing", "Ribbuny", "Incineram", "Cinnamoth", "Arsox", "Dumud", "Cawgnito", "Leezpunk", "Loupmoon", "Galeclaw", "Robinquill", "Gorirat", "Beegarde", "Elizabee", "Grintale", "Swee", "Sweepa", "Chillet", "Univolt", "Foxcicle", "Pyrin", "Reindrix", "Rayhound", "Kitsun", "Dazzi", "Lunaris", "Dinossom", "Surfent", "Maraith", "Digtoise", "Tombat", "Lovander", "Flambelle", "Vanwyrm", "Bushi", "Beakon", "Ragnahawk", "Katress", "Wixen", "Verdash", "Vaelet", "Sibelyx", "Elphidran", "Azurobe", "Cryolinx", "Blazehowl", "Relaxaurus", "Broncherry", "Petallia", "Reptyro", "Kingpaca", "Mammorest", "Wumpo", "Warsect", "Fenglope", "Felbat", "Quivern", "Helzephyr", "Menasting", "Suzaku", "Faleris", "Selyne", "Knocklem"
+];
+
+EXTRA_PALS.forEach(name => {
+    if (!PALS_DB.some(p => p.name === name)) {
+        PALS_DB.push({
+            name: name,
+            element: "Neutre / Mixte",
+            power: 500,
+            zone: "Zones sauvages / Donjons",
+            tp: "Point de TP le plus proche",
+            work: "Travaux multiples",
+            url: `https://palworld.gg/fr/pal/${name.toLowerCase().replace(/\s+/g, '-')}`
+        });
+    }
+});
+
+// LISTE DE TUPOS YOUTUBE RECOMMANDÉS PAR DÉFAUT
+const DEFAULT_TUTORIALS = [
+    { id: "t1", title: "Guide Ultime de la Reproduction & Passifs", cat: "Reproduction", url: "https://www.youtube.com/results?search_query=palworld+guide+reproduction+passifs" },
+    { id: "t2", title: "Optimiser sa Base & Automatisation des Fermes", cat: "Farm", url: "https://www.youtube.com/results?search_query=palworld+optimiser+base+fermes" },
+    { id: "t3", title: "Comment Farmer l'Huile de Pal & le Métal Rapidement", cat: "Farm", url: "https://www.youtube.com/results?search_query=palworld+farm+huile+de+pal+metal" },
+    { id: "t4", title: "Les 10 Astuces que J'aurais Aimé Connaître Débutant", cat: "Débutant", url: "https://www.youtube.com/results?search_query=palworld+astuces+debutant" },
+    { id: "t5", title: "Emplacements des Boss & Tours Endgame", cat: "Endgame", url: "https://www.youtube.com/results?search_query=palworld+boss+tours+endgame" }
+];
+
+const SPECIAL_BREEDS = [
+    { p1: "Grizzbolt", p2: "Relaxaurus", child: "Orserk" },
+    { p1: "Jormuntide", p2: "Blazehowl", child: "Jormuntide Ignis" },
+    { p1: "Frostallion", p2: "Helzephyr", child: "Frostallion Noct" },
+    { p1: "Mossanda", p2: "Petallia", child: "Lyleen" },
+    { p1: "Mossanda", p2: "Rayhound", child: "Grizzbolt" },
+    { p1: "Kitsun", p2: "Astegon", child: "Shadowbeak" },
+    { p1: "Frostallion", p2: "Anubis", child: "Bastigor" }
+];
+
+const CATEGORY_COLORS = { "Matériaux": "#f59e0b", "Sphères": "#3b82f6", "Armes": "#ef4444", "Munitions": "#64748b", "Équipement": "#8b5cf6", "Consommables": "#10b981" };
+
+const RECIPES_DB = {
+    "Lingot": { cat: "Matériaux", station: "Four", work: "Allumage", ingredients: { "Minerai de métal": 2 }, url: "https://palworld.gg/fr/item/metal-ingot" },
+    "Lingot de métal raffiné": { cat: "Matériaux", station: "Four amélioré", work: "Allumage", ingredients: { "Minerai de métal": 2, "Charbon": 2 }, url: "https://palworld.gg/fr/item/refined-metal-ingot" },
+    "Lingot de paluminium": { cat: "Matériaux", station: "Four électrique", work: "Allumage", ingredients: { "Minerai de métal": 4, "Éclat de paldium": 2 }, url: "https://palworld.gg/fr/item/palium-ingot" },
+    "Plasteel": { cat: "Matériaux", station: "Four électrique", work: "Allumage", ingredients: { "Pétrole brut": 2, "Éclat de paldium": 2, "Minerai de métal": 2 }, url: "https://palworld.gg/fr/item/plasteel" },
+    "Clou": { cat: "Matériaux", station: "Établi", work: "Travaux manuels", ingredients: { "Lingot": 0.5 }, url: "https://palworld.gg/fr/item/nail" },
+    "Ciment": { cat: "Matériaux", station: "Établi", work: "Travaux manuels", ingredients: { "Pierre": 5, "Os": 0.1, "Fluide de Pal": 0.1 }, url: "https://palworld.gg/fr/item/cement" },
+    "Fibre de carbone": { cat: "Matériaux", station: "Chaîne de production", work: "Travaux manuels", ingredients: { "Charbon": 2 }, url: "https://palworld.gg/fr/item/carbon-fiber" },
+    "Polymère": { cat: "Matériaux", station: "Chaîne de production", work: "Travaux manuels", ingredients: { "Huile de Pal de qualité": 2 }, url: "https://palworld.gg/fr/item/polymer" },
+    "Circuit imprimé": { cat: "Matériaux", station: "Chaîne de production II", work: "Travaux manuels", ingredients: { "Quartz pur": 4, "Polymère": 2 }, url: "https://palworld.gg/fr/item/circuit-board" },
+    "Sphère de Pal": { cat: "Sphères", station: "Établi", work: "Travaux manuels", ingredients: { "Éclat de paldium": 1, "Bois": 3, "Pierre": 3 }, url: "https://palworld.gg/fr/item/pal-sphere" },
+    "Méga sphère": { cat: "Sphères", station: "Établi de sphères", work: "Travaux manuels", ingredients: { "Éclat de paldium": 1, "Lingot": 1, "Bois": 5, "Pierre": 5 }, url: "https://palworld.gg/fr/item/mega-sphere" },
+    "Giga sphère": { cat: "Sphères", station: "Établi de sphères", work: "Travaux manuels", ingredients: { "Éclat de paldium": 2, "Lingot": 2, "Bois": 7, "Pierre": 7 }, url: "https://palworld.gg/fr/item/giga-sphere" },
+    "Ultra sphère": { cat: "Sphères", station: "Chaîne de sphères II", work: "Travaux manuels", ingredients: { "Éclat de paldium": 5, "Lingot de métal raffiné": 5, "Fibre de carbone": 2, "Ciment": 3 }, url: "https://palworld.gg/fr/item/ultra-sphere" },
+    "Sphère légendaire": { cat: "Sphères", station: "Chaîne de sphères II", work: "Travaux manuels", ingredients: { "Éclat de paldium": 10, "Lingot de paluminium": 5, "Fibre de carbone": 5, "Ciment": 5 }, url: "https://palworld.gg/fr/item/legendary-sphere" },
+    "Pistolet": { cat: "Armes", station: "Chaîne d'armes", work: "Travaux manuels", ingredients: { "Lingot": 50, "Huile de Pal de qualité": 15 }, url: "https://palworld.gg/fr/item/handgun" },
+    "Fusil d'assaut": { cat: "Armes", station: "Chaîne d'armes II", work: "Travaux manuels", ingredients: { "Lingot de métal raffiné": 40, "Polymère": 10, "Fibre de carbone": 30 }, url: "https://palworld.gg/fr/item/assault-rifle" },
+    "Lance-roquettes": { cat: "Armes", station: "Chaîne d'armes II", work: "Travaux manuels", ingredients: { "Lingot de paluminium": 75, "Polymère": 30, "Fibre de carbone": 50 }, url: "https://palworld.gg/fr/item/rocket-launcher" },
+    "Munition ordinaire": { cat: "Munitions", station: "Établi d'armes", work: "Travaux manuels", ingredients: { "Lingot": 1, "Poudre à canon": 1 }, url: "https://palworld.gg/fr/item/ordinary-ammunition" },
+    "Bouclier ordinaire": { cat: "Équipement", station: "Établi", work: "Travaux manuels", ingredients: { "Éclat de paldium": 10, "Bois": 20, "Pierre": 20 }, url: "https://palworld.gg/fr/item/common-shield" },
+    "Gâteau (Reproduction)": { cat: "Consommables", station: "Marmite", work: "Allumage", ingredients: { "Farine": 5, "Baies rouges": 8, "Lait": 7, "Œuf": 8, "Miel": 2 }, url: "https://palworld.gg/fr/item/cake" }
+};
+
+const DEFAULT_WIKI_GUIDES = [
+    { id: "g1", title: "Meilleurs Passifs Travail", tags: "Passifs, Camp", content: "Artisan (+50%), Travailleur acharné (+30%), Sérieux (+20%)." },
+    { id: "g2", title: "Farm Huile de Pal", tags: "Farm", content: "Chasser Relaxaurus, Mammorest ou Dumud." }
+];
+
+PALS_DB.sort((a, b) => a.name.localeCompare(b.name));
+
+function getAvatarHTML(name, type, large = false) {
+    const color = type === 'pal' ? (ELEMENT_COLORS[PALS_DB.find(p => p.name === name)?.element] || "#64748b") : (CATEGORY_COLORS[RECIPES_DB[name]?.cat] || "#475569");
+    return `<div class="avatar-badge ${large ? 'avatar-lg' : ''}" style="background-color: ${color};" title="${name}">${name.substring(0, 2).toUpperCase()}</div>`;
+}
+
+function init() {
+    ['targetPal', 'parent1', 'parent2', 'myPalSpecies', 'condTargetPal'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        PALS_DB.forEach(pal => {
+            const opt = document.createElement('option');
+            opt.value = pal.name;
+            opt.textContent = `${pal.name} (${pal.element})`;
+            el.appendChild(opt);
+        });
+    });
+
+    document.getElementById('targetPal').value = "Anubis";
+    document.getElementById('condTargetPal').value = "Anubis";
+    findParents(); simulateBreeding(); populateCraftSelect(); searchWiki(); renderMyPals(); renderInventory(); calculateCondensation(); renderTutorials();
+}
+
+function populateCraftSelect() {
+    const catFilter = document.getElementById('craftCategoryFilter').value;
+    const craftSelect = document.getElementById('craftItem');
+    const currentVal = craftSelect.value;
+    craftSelect.innerHTML = '';
+    Object.keys(RECIPES_DB).sort().forEach(item => {
+        if (catFilter === 'all' || RECIPES_DB[item].cat === catFilter) {
+            const opt = document.createElement('option'); opt.value = item; opt.textContent = item; craftSelect.appendChild(opt);
+        }
+    });
+    if (Array.from(craftSelect.options).some(o => o.value === currentVal)) craftSelect.value = currentVal;
+    calculateProduction();
+}
+
+function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+}
+
+function getChild(p1Name, p2Name) {
+    const special = SPECIAL_BREEDS.find(s => (s.p1 === p1Name && s.p2 === p2Name) || (s.p1 === p2Name && s.p2 === p1Name));
+    if (special) return { name: special.child, isSpecial: true };
+    if (p1Name === p2Name) return { name: p1Name, isSpecial: false };
+    const p1 = PALS_DB.find(p => p.name === p1Name);
+    const p2 = PALS_DB.find(p => p.name === p2Name);
+    if (!p1 || !p2) return null;
+    const targetPower = Math.floor((p1.power + p2.power + 1) / 2);
+    let closest = PALS_DB[0]; let minDiff = Math.abs(targetPower - closest.power);
+    for (let pal of PALS_DB) {
+        if (SPECIAL_BREEDS.some(s => s.child === pal.name)) continue;
+        const diff = Math.abs(targetPower - pal.power);
+        if (diff < minDiff) { minDiff = diff; closest = pal; }
+    }
+    return { name: closest.name, isSpecial: false };
+}
+
+function simulateBreeding() {
+    const p1 = document.getElementById('parent1').value;
+    const p2 = document.getElementById('parent2').value;
+    const child = getChild(p1, p2);
+    const box = document.getElementById('breedingResult');
+    if (child) {
+        box.innerHTML = `<div class="entity-row">${getAvatarHTML(child.name, 'pal', true)}<div><strong>Résultat :</strong> <span style="font-size:1.2rem; color:var(--accent);">${child.name}</span> ${child.isSpecial ? '<span class="badge">Spécial</span>' : ''}</div></div>`;
+    }
+}
+
+function findParents() {
+    const target = document.getElementById('targetPal').value;
+    const list = document.getElementById('parentsList');
+    let combos = [];
+    for (let i = 0; i < PALS_DB.length; i++) {
+        for (let j = i; j < PALS_DB.length; j++) {
+            const p1 = PALS_DB[i].name; const p2 = PALS_DB[j].name;
+            const res = getChild(p1, p2);
+            if (res && res.name === target) combos.push({ p1, p2, isSpecial: res.isSpecial });
+        }
+    }
+    list.innerHTML = combos.length === 0 ? `<p style="color:var(--text-muted);">Aucune combinaison.</p>` :
+        combos.map(c => `<div style="padding: 6px; border-bottom: 1px solid var(--border); display:flex; justify-content:space-between; align-items:center;"><div class="entity-row">${getAvatarHTML(c.p1, 'pal')} <strong>${c.p1}</strong> + ${getAvatarHTML(c.p2, 'pal')} <strong>${c.p2}</strong></div>${c.isSpecial ? '<span class="badge">Spécial</span>' : ''}</div>`).join('');
+}
+
+function resolveIngredients(itemName, qty, rawTotals = {}) {
+    const recipe = RECIPES_DB[itemName];
+    if (!recipe) { rawTotals[itemName] = (rawTotals[itemName] || 0) + qty; return; }
+    for (const [ing, amount] of Object.entries(recipe.ingredients)) { resolveIngredients(ing, amount * qty, rawTotals); }
+}
+
+function calculateProduction() {
+    const item = document.getElementById('craftItem').value;
+    if (!item) return;
+    const qty = parseFloat(document.getElementById('craftQty').value) || 1;
+    const recipe = RECIPES_DB[item];
+    const rawTotals = {};
+    resolveIngredients(item, qty, rawTotals);
+    const inventory = getSavedInventory();
+
+    document.getElementById('productionSummary').innerHTML = `<div class="entity-row">${getAvatarHTML(item, 'recipe', true)}<div><strong>Objectif :</strong> ${qty}x ${item}<br><strong>Atelier :</strong> ${recipe.station}</div></div>`;
+
+    let html = `<h4>Ressources nécessaires vs Stock :</h4><div style="margin-top: 10px;">`;
+    for (const [res, needed] of Object.entries(rawTotals)) {
+        const neededCeil = Math.ceil(needed);
+        const inStock = inventory[res] || 0;
+        const missing = neededCeil - inStock;
+        let badgeHtml = missing <= 0 ? `<span class="badge badge-success">OK (${inStock})</span>` : `<span class="badge badge-danger">Manque ${missing}</span>`;
+        html += `<div style="margin-bottom: 6px; display:flex; justify-content:space-between; align-items:center;"><span><strong>${neededCeil}x</strong> ${res}</span> ${badgeHtml}</div>`;
+    }
+    html += `</div>`;
+    document.getElementById('rawResourcesList').innerHTML = html;
+}
+
+function calculateCondensation() {
+    const palName = document.getElementById('condTargetPal').value;
+    const currentStars = parseInt(document.getElementById('condCurrentStars').value) || 0;
+    const owned = parseInt(document.getElementById('condOwned').value) || 0;
+
+    const tiers = [
+        { level: 1, name: "⭐ 1 Étoile", required: 4 },
+        { level: 2, name: "⭐⭐ 2 Étoiles", required: 20 },
+        { level: 3, name: "⭐⭐⭐ 3 Étoiles", required: 52 },
+        { level: 4, name: "⭐⭐⭐⭐ 4 Étoiles (Max)", required: 116 }
+    ];
+
+    const baseAlreadyDone = currentStars === 0 ? 0 : tiers[currentStars - 1].required;
+    const totalEffective = baseAlreadyDone + owned;
+
+    let nextTier = tiers.find(t => t.required > totalEffective);
+    let targetTotal = nextTier ? nextTier.required : 116;
+    let missing = Math.max(0, targetTotal - totalEffective);
+
+    let summaryHTML = `
+        <div class="entity-row" style="margin-bottom:12px;">
+            ${getAvatarHTML(palName, 'pal', true)}
+            <div>
+                <strong>Cible :</strong> ${palName}<br>
+                <span style="color:var(--accent); font-size:1.1rem;">Total effectif : ${totalEffective} / ${targetTotal} doublons</span>
+            </div>
+        </div>
+    `;
+
+    if (totalEffective >= 116) {
+        summaryHTML += `<div style="color:var(--success); font-weight:bold;">🎉 Félicitations ! Ce Pal est au rang maximum (4 Étoiles).</div>`;
+    } else {
+        summaryHTML += `<div>Il te manque <strong>${missing} doublons</strong> (en plus de ton rang actuel) pour atteindre le palier suivant (${nextTier ? nextTier.name : 'Max'}).</div>`;
+    }
+
+    document.getElementById('condensationSummary').innerHTML = summaryHTML;
+}
+
+// Gestion des tutoriels et liens vidéo
+function getCustomTutorials() { return JSON.parse(localStorage.getItem('palworldCustomTutos') || '[]'); }
+function addCustomVideo() {
+    const title = document.getElementById('customVideoTitle').value.trim();
+    const cat = document.getElementById('customVideoCat').value;
+    const url = document.getElementById('customVideoUrl').value.trim();
+    if (!title || !url) return;
+    const tutos = getCustomTutorials();
+    tutos.push({ id: "t_" + Date.now(), title, cat, url, isCustom: true });
+    localStorage.setItem('palworldCustomTutos', JSON.stringify(tutos));
+    document.getElementById('customVideoTitle').value = ''; document.getElementById('customVideoUrl').value = '';
+    renderTutorials();
+}
+function deleteCustomVideo(id) {
+    localStorage.setItem('palworldCustomTutos', JSON.stringify(getCustomTutorials().filter(t => t.id !== id)));
+    renderTutorials();
+}
+
+function renderTutorials() {
+    const query = (document.getElementById('videoSearchFilter')?.value || '').toLowerCase().trim();
+    const catFilter = document.getElementById('videoCatFilter')?.value || 'all';
+    const grid = document.getElementById('tutorialsGrid');
+    const allTutos = [...getCustomTutorials(), ...DEFAULT_TUTORIALS];
+
+    let cardsHTML = [];
+    allTutos.forEach(t => {
+        if ((catFilter === 'all' || t.cat === catFilter) && (!query || t.title.toLowerCase().includes(query))) {
+            cardsHTML.push(`
+                <div class="wiki-card">
+                    <div>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                            <span class="badge" style="background:rgba(56,189,248,0.2); color:var(--accent);">${t.cat}</span>
+                            ${t.isCustom ? `<button class="danger-btn" onclick="deleteCustomVideo('${t.id}')">X</button>` : ''}
+                        </div>
+                        <strong style="color:var(--text-main); font-size:0.95rem; display:block; margin-bottom:8px;">${t.title}</strong>
+                    </div>
+                    <a href="${t.url}" target="_blank" class="secondary-btn" style="text-align:center;">▶️ Regarder sur YouTube</a>
+                </div>
+            `);
+        }
+    });
+    grid.innerHTML = cardsHTML.length > 0 ? cardsHTML.join('') : `<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center;">Aucune vidéo trouvée.</p>`;
+}
+
+function getCustomWikiNotes() { return JSON.parse(localStorage.getItem('palworldCustomWiki') || '[]'); }
+function addCustomWikiNote() {
+    const title = document.getElementById('customWikiTitle').value.trim();
+    const tags = document.getElementById('customWikiTags').value.trim() || "Note";
+    const content = document.getElementById('customWikiContent').value.trim();
+    if (!title || !content) return;
+    const notes = getCustomWikiNotes();
+    notes.push({ id: "c_" + Date.now(), title, tags, content, isCustom: true });
+    localStorage.setItem('palworldCustomWiki', JSON.stringify(notes));
+    document.getElementById('customWikiTitle').value = ''; document.getElementById('customWikiTags').value = ''; document.getElementById('customWikiContent').value = '';
+    searchWiki();
+}
+function deleteCustomWikiNote(id) {
+    localStorage.setItem('palworldCustomWiki', JSON.stringify(getCustomWikiNotes().filter(n => n.id !== id)));
+    searchWiki();
+}
+
+function searchWiki() {
+    const query = document.getElementById('wikiSearchInput').value.toLowerCase().trim();
+    const filter = document.getElementById('wikiFilterType').value;
+    const grid = document.getElementById('wikiResultsGrid');
+    let cardsHTML = [];
+
+    if (filter === 'all' || filter === 'pal') {
+        PALS_DB.forEach(p => {
+            if (!query || `${p.name} ${p.element} ${p.zone} ${p.tp}`.toLowerCase().includes(query)) {
+                cardsHTML.push(`
+                    <div class="wiki-card">
+                        <div>
+                            <div class="entity-row" style="margin-bottom:8px;">
+                                ${getAvatarHTML(p.name, 'pal')}
+                                <div><strong style="color:var(--accent);">${p.name}</strong><br><span class="badge">${p.element}</span></div>
+                            </div>
+                            <p style="font-size:0.85rem; margin-bottom:4px;">📍 <strong>Zone :</strong> ${p.zone || 'Inconnue'}</p>
+                            <p style="font-size:0.85rem; margin-bottom:4px;">⚡ <strong>TP Proche :</strong> ${p.tp || 'Aucun'}</p>
+                            <p style="font-size:0.80rem; color:var(--text-muted); margin-top:6px;">🛠️ ${p.work || ''}</p>
+                        </div>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <button class="secondary-btn" style="flex:1;" onclick="document.getElementById('targetPal').value='${p.name}'; findParents(); switchTab('breeding', document.querySelectorAll('.tab-btn')[2]);">🧬 Parents</button>
+                            <a href="${p.url}" target="_blank" class="secondary-btn" style="flex:1;" title="Voir la fiche officielle">🌐 Wiki</a>
+                        </div>
+                    </div>
+                `);
+            }
+        });
+    }
+    if (filter === 'all' || filter === 'recipe') {
+        Object.entries(RECIPES_DB).forEach(([name, rec]) => {
+            if (!query || name.toLowerCase().includes(query)) {
+                cardsHTML.push(`
+                    <div class="wiki-card">
+                        <div>
+                            <div class="entity-row" style="margin-bottom:8px;">
+                                ${getAvatarHTML(name, 'recipe')}
+                                <div><strong style="color:var(--accent);">${name}</strong><br><span class="badge">${rec.cat}</span></div>
+                            </div>
+                            <p style="font-size:0.85rem;"><strong>Atelier :</strong> ${rec.station}</p>
+                        </div>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <button class="secondary-btn" style="flex:1;" onclick="document.getElementById('craftItem').value='${name}'; calculateProduction(); switchTab('production', document.querySelectorAll('.tab-btn')[3]);">⚙️ Craft</button>
+                            <a href="${rec.url}" target="_blank" class="secondary-btn" style="flex:1;" title="Voir l'objet en ligne">🌐 Wiki</a>
+                        </div>
+                    </div>
+                `);
+            }
+        });
+    }
+    if (filter === 'all' || filter === 'guide') {
+        [...getCustomWikiNotes(), ...DEFAULT_WIKI_GUIDES].forEach(g => {
+            if (!query || `${g.title} ${g.tags} ${g.content}`.toLowerCase().includes(query)) {
+                cardsHTML.push(`<div class="wiki-card" style="border-left: 3px solid var(--warning);"><div><div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong style="color:var(--warning);">${g.title}</strong>${g.isCustom ? `<button class="danger-btn" onclick="deleteCustomWikiNote('${g.id}')">X</button>` : ''}</div><p style="font-size:0.85rem;">${g.content}</p></div></div>`);
+            }
+        });
+    }
+    grid.innerHTML = cardsHTML.length > 0 ? cardsHTML.join('') : `<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center;">Aucun résultat.</p>`;
+}
+
+function getSavedInventory() { return JSON.parse(localStorage.getItem('palworldInventory') || '{}'); }
+function saveInventoryItem() {
+    const name = document.getElementById('invItemName').value.trim();
+    const qty = parseInt(document.getElementById('invItemQty').value) || 0;
+    if (!name) return;
+    let inv = getSavedInventory(); inv[name] = qty;
+    localStorage.setItem('palworldInventory', JSON.stringify(inv));
+    document.getElementById('invItemName').value = ''; document.getElementById('invItemQty').value = '0';
+    renderInventory(); calculateProduction();
+}
+function updateQty(name, delta) {
+    let inv = getSavedInventory(); inv[name] = Math.max(0, (inv[name] || 0) + delta);
+    localStorage.setItem('palworldInventory', JSON.stringify(inv));
+    renderInventory(); calculateProduction();
+}
+function deleteInventoryItem(name) {
+    let inv = getSavedInventory(); delete inv[name];
+    localStorage.setItem('palworldInventory', JSON.stringify(inv));
+    renderInventory(); calculateProduction();
+}
+function renderInventory() {
+    const inv = getSavedInventory();
+    const filter = (document.getElementById('invSearch')?.value || '').toLowerCase();
+    const tbody = document.getElementById('inventoryTable');
+    const keys = Object.keys(inv).sort().filter(k => k.toLowerCase().includes(filter));
+    if (keys.length === 0) { tbody.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted); text-align:center;">Vide.</td></tr>`; return; }
+    tbody.innerHTML = keys.map(k => `<tr><td><strong>${k}</strong></td><td style="font-weight:bold; color:var(--accent);">${inv[k]}</td><td><button class="qty-btn" onclick="updateQty('${k}', -1)">-1</button> <button class="qty-btn" onclick="updateQty('${k}', 1)">+1</button></td><td><button class="danger-btn" onclick="deleteInventoryItem('${k}')">Suppr.</button></td></tr>`).join('');
+}
+
+function getSavedPals() { return JSON.parse(localStorage.getItem('myPalworldPals') || '[]'); }
+function addMyPal() {
+    const species = document.getElementById('myPalSpecies').value;
+    const passives = document.getElementById('myPalPassives').value.trim() || "Aucun";
+    let pals = getSavedPals(); pals.push({ id: Date.now(), species, passives });
+    localStorage.setItem('myPalworldPals', JSON.stringify(pals));
+    document.getElementById('myPalPassives').value = ''; renderMyPals();
+}
+function deleteMyPal(id) {
+    localStorage.setItem('myPalworldPals', JSON.stringify(getSavedPals().filter(p => p.id !== id)));
+    renderMyPals();
+}
+function renderMyPals() {
+    const pals = getSavedPals();
+    const tbody = document.getElementById('myPalsTable');
+    tbody.innerHTML = pals.length === 0 ? `<tr><td colspan="4" style="color:var(--text-muted); text-align:center;">Aucun Pal.</td></tr>` :
+        pals.map(p => `<tr><td><strong>${p.species}</strong></td><td>${PALS_DB.find(i => i.name === p.species)?.power || '?'}</td><td><span class="badge">${p.passives}</span></td><td><button class="danger-btn" onclick="deleteMyPal(${p.id})">Suppr.</button></td></tr>`).join('');
+}
+
+function exportBackup() {
+    const data = { inventory: getSavedInventory(), pals: getSavedPals(), wikiNotes: getCustomWikiNotes(), tutos: getCustomTutorials() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = `palworld_hub_backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
+}
+function importBackup(event) {
+    const file = event.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (data.inventory) localStorage.setItem('palworldInventory', JSON.stringify(data.inventory));
+            if (data.pals) localStorage.setItem('myPalworldPals', JSON.stringify(data.pals));
+            if (data.wikiNotes) localStorage.setItem('palworldCustomWiki', JSON.stringify(data.wikiNotes));
+            if (data.tutos) localStorage.setItem('palworldCustomTutos', JSON.stringify(data.tutos));
+            renderInventory(); renderMyPals(); searchWiki(); calculateProduction(); renderTutorials(); alert("Import réussi !");
+        } catch (err) { alert("Erreur de fichier."); }
+    };
+    reader.readAsText(file);
+}
+
+window.onload = function() {
+    init();
+    calculateCondensation();
+};
+</script>
+</body>
+</html>
